@@ -1,0 +1,6 @@
+{
+  "name": "QuranHabit: Daily Ayah Reminder & Tracker",
+  "description": "Distraction-free daily Quran reading habit tracker with micro-goals, smart auto-dismissing reminders, Uthmani and Indo-Pak scripts, translations, audio recitation, and daily Azkar.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

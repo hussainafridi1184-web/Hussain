@@ -1,0 +1,94 @@
+{
+  "id": "/",
+  "name": "QuranHabit: Daily Ayah Reminder & Tracker",
+  "short_name": "QuranHabit",
+  "description": "Distraction-free daily Quran reading habit tracker with micro-goals, smart auto-dismissing reminders, Uthmani and Indo-Pak scripts, translations, audio recitation, and daily Azkar.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": [
+    "standalone",
+    "minimal-ui",
+    "browser"
+  ],
+  "orientation": "portrait",
+  "theme_color": "#064e3b",
+  "background_color": "#0f172a",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": [
+    "books",
+    "education",
+    "lifestyle"
+  ],
+  "prefer_related_applications": false,
+  "related_applications": [],
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshot-wide.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "QuranHabit Desktop Habit Tracker Dashboard"
+    },
+    {
+      "src": "/screenshot-narrow.png",
+      "sizes": "720x1280",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "QuranHabit Mobile Daily Ayah Reader"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Daily Ayah",
+      "short_name": "Ayah",
+      "description": "Read today's assigned Ayah and reflection",
+      "url": "/#daily",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Daily Azkar",
+      "short_name": "Azkar",
+      "description": "Morning and evening remembrances with digital counter",
+      "url": "/#azkar",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
+}
