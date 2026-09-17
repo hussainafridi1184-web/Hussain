@@ -107,18 +107,18 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   const [customTimeValue, setCustomTimeValue] = useState<string>('07:30');
 
   // Profile Name state
-  const currentUserName = settings.userName?.trim() || 'Hussain Afridi';
+  const currentUserName = settings.userName?.trim() || '';
   const [nameInput, setNameInput] = useState<string>(currentUserName);
   const [nameSaved, setNameSaved] = useState<boolean>(false);
 
   // Sync state if settings prop changes externally
   useEffect(() => {
-    setNameInput(settings.userName?.trim() || 'Hussain Afridi');
+    setNameInput(settings.userName?.trim() || '');
   }, [settings.userName]);
 
   const getInitials = (name: string): string => {
     const parts = name.trim().split(/\s+/).filter(Boolean);
-    if (parts.length === 0) return 'HA';
+    if (parts.length === 0) return 'QH';
     if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
     return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
   };
@@ -126,11 +126,18 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 
   const handleSaveName = () => {
     const trimmed = nameInput.trim();
-    if (!trimmed) return;
     onUpdateSettings({ userName: trimmed });
+    try {
+      if (trimmed) {
+        localStorage.setItem('quranhabit_user_name', trimmed);
+      } else {
+        localStorage.removeItem('quranhabit_user_name');
+        localStorage.removeItem('quranhabit_profile_name');
+      }
+    } catch (_) {}
     setNameSaved(true);
     triggerHaptic('medium');
-    showToast(`Profile name updated to "${trimmed}"`);
+    showToast(trimmed ? `Profile name updated to "${trimmed}"` : 'Profile name cleared (using generic greeting)');
     setTimeout(() => setNameSaved(false), 2500);
   };
 
@@ -1561,7 +1568,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             </button>
           </div>
           <p className="text-[10px] text-slate-400 mt-1.5">
-            This name appears immediately in your Home greeting ("Asalam Alaykum, {currentUserName}") and Habit tracking.
+            This name personalizes your Home greeting ({currentUserName ? `"Asalam Alaykum, ${currentUserName}"` : '"Asalam Alaykum"'}) and Habit tracking.
           </p>
         </div>
       </div>

@@ -26,6 +26,7 @@ import {
   Play,
   Pause,
   Volume2,
+  User,
 } from 'lucide-react';
 import { BookmarkPosition, DailyProgress, HabitSettings, HabitStats } from '../types';
 
@@ -56,6 +57,7 @@ interface HomeDashboardProps {
   onReadQuran: () => void;
   onResumeSurah: (surahNumber: number, ayahNumber: number) => void;
   onOpenSettings?: () => void;
+  onUpdateSettings?: (newSettings: Partial<HabitSettings>) => void;
   onChallengeComplete?: (hasanat: number) => void;
   isDark?: boolean;
 }
@@ -205,6 +207,7 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
   onReadQuran,
   onResumeSurah,
   onOpenSettings,
+  onUpdateSettings,
   onChallengeComplete,
 }) => {
   // Live reading counter fluctuating realistically around 362
@@ -476,20 +479,46 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
   ];
 
   const handleShareInvite = () => {
-    navigator.clipboard?.writeText('https://quranhabit.app/join?ref=hussainafridi');
+    navigator.clipboard?.writeText('https://quranhabit.app/join');
     setCopiedLink(true);
     setTimeout(() => setCopiedLink(false), 2500);
   };
 
+  // Quick Name Edit Dialog state
+  const [showNameModal, setShowNameModal] = useState<boolean>(false);
+  const [nameInputValue, setNameInputValue] = useState<string>('');
+
   // Dynamic profile name and initials
-  const currentUserName = settings.userName?.trim() || 'Hussain Afridi';
+  const customUserName = settings.userName?.trim() || '';
   const getInitials = (name: string): string => {
     const parts = name.trim().split(/\s+/).filter(Boolean);
-    if (parts.length === 0) return 'HA';
+    if (parts.length === 0) return 'QH';
     if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
     return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
   };
-  const userInitials = getInitials(currentUserName);
+  const userInitials = getInitials(customUserName);
+
+  const handleOpenNameModal = () => {
+    setNameInputValue(customUserName);
+    setShowNameModal(true);
+  };
+
+  const handleSaveProfileName = (e?: React.FormEvent) => {
+    e?.preventDefault();
+    const trimmed = nameInputValue.trim();
+    if (onUpdateSettings) {
+      onUpdateSettings({ userName: trimmed });
+    }
+    try {
+      if (trimmed) {
+        localStorage.setItem('quranhabit_user_name', trimmed);
+      } else {
+        localStorage.removeItem('quranhabit_user_name');
+        localStorage.removeItem('quranhabit_profile_name');
+      }
+    } catch (_) {}
+    setShowNameModal(false);
+  };
 
   return (
     <div className="space-y-4 text-slate-100 select-none pb-32 sm:pb-36">
@@ -502,26 +531,46 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
             <button
               id="home-profile-avatar-btn"
               type="button"
-              onClick={onOpenSettings}
+              onClick={handleOpenNameModal}
               className="w-11 h-11 rounded-full bg-[#5AD8B5] text-[#0B3327] font-black text-sm flex items-center justify-center shadow-md shadow-emerald-950/40 shrink-0 hover:scale-105 active:scale-95 transition-transform cursor-pointer"
-              title="Edit Profile Name in Settings"
+              title={customUserName ? `Name: ${customUserName} (Tap to change)` : 'Add your name'}
             >
-              {userInitials}
+              {customUserName ? userInitials : <User className="w-5 h-5" />}
             </button>
             <div>
-              <span className="text-xs text-slate-300 font-medium block">Asalam Alaykum,</span>
-              <button
-                id="home-profile-name-btn"
-                type="button"
-                onClick={onOpenSettings}
-                className="text-left group flex items-center gap-1.5 focus:outline-none cursor-pointer"
-                title="Edit Profile Name in Settings"
-              >
-                <h2 className="text-base font-extrabold text-white tracking-tight group-hover:text-emerald-300 transition-colors">
-                  {currentUserName}
-                </h2>
-                <Edit2 className="w-3.5 h-3.5 text-slate-400 opacity-60 group-hover:opacity-100 group-hover:text-emerald-300 transition-all" />
-              </button>
+              {customUserName ? (
+                <>
+                  <span className="text-xs text-slate-300 font-medium block">Asalam Alaykum,</span>
+                  <button
+                    id="home-profile-name-btn"
+                    type="button"
+                    onClick={handleOpenNameModal}
+                    className="text-left group flex items-center gap-1.5 focus:outline-none cursor-pointer"
+                    title="Edit Name"
+                  >
+                    <h2 className="text-base font-extrabold text-white tracking-tight group-hover:text-emerald-300 transition-colors">
+                      {customUserName}
+                    </h2>
+                    <Edit2 className="w-3.5 h-3.5 text-slate-400 opacity-60 group-hover:opacity-100 group-hover:text-emerald-300 transition-all" />
+                  </button>
+                </>
+              ) : (
+                <>
+                  <h2 className="text-base font-extrabold text-white tracking-tight">
+                    Asalam Alaykum
+                  </h2>
+                  <button
+                    id="home-profile-set-name-btn"
+                    type="button"
+                    onClick={handleOpenNameModal}
+                    className="text-left group flex items-center gap-1 text-xs text-emerald-400/90 hover:text-emerald-300 transition-colors focus:outline-none cursor-pointer font-medium"
+                    title="Add your name"
+                  >
+                    <span>Welcome to QuranHabit</span>
+                    <Edit2 className="w-3 h-3 opacity-70 group-hover:opacity-100" />
+                  </button>
+                </>
+              )}
             </div>
           </div>
 
@@ -1363,6 +1412,88 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
             <ShieldCheck className="w-4 h-4" />
             <span>{shieldClaimToast}</span>
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Quick Profile Name Edit Dialog */}
+      <AnimatePresence>
+        {showNameModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm">
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="w-full max-w-sm rounded-3xl p-5 sm:p-6 bg-gradient-to-b from-[#1E1535] to-[#120B24] border border-purple-500/30 text-white shadow-2xl relative"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                    <Edit2 className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h3 className="font-extrabold text-sm">Personalize Your Name</h3>
+                    <p className="text-[11px] text-purple-200/70">Greeting & habit progress display</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowNameModal(false)}
+                  className="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 text-slate-300 flex items-center justify-center text-xs transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              <form onSubmit={handleSaveProfileName} className="space-y-4">
+                <div>
+                  <label htmlFor="home-name-input" className="text-xs font-semibold text-purple-200 block mb-1.5">
+                    Your Preferred Name
+                  </label>
+                  <input
+                    id="home-name-input"
+                    type="text"
+                    value={nameInputValue}
+                    onChange={(e) => setNameInputValue(e.target.value)}
+                    placeholder="Enter your name (e.g. Tariq, Sarah)"
+                    maxLength={32}
+                    autoFocus
+                    className="w-full px-3.5 py-2.5 rounded-2xl bg-black/40 border border-purple-500/30 text-white placeholder-purple-300/40 text-sm font-semibold focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400 transition-all"
+                  />
+                  <p className="text-[11px] text-purple-200/60 mt-1.5">
+                    Leave blank to show the clean generic "Asalam Alaykum" greeting.
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2 pt-1">
+                  {customUserName && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setNameInputValue('');
+                        if (onUpdateSettings) {
+                          onUpdateSettings({ userName: '' });
+                        }
+                        try {
+                          localStorage.removeItem('quranhabit_user_name');
+                          localStorage.removeItem('quranhabit_profile_name');
+                        } catch (_) {}
+                        setShowNameModal(false);
+                      }}
+                      className="px-3 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-rose-300 hover:text-rose-200 text-xs font-semibold transition-colors"
+                    >
+                      Clear Name
+                    </button>
+                  )}
+                  <button
+                    type="submit"
+                    className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-xs shadow-lg shadow-emerald-950/40 transition-all active:scale-[0.98]"
+                  >
+                    Save Greeting
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
     </div>

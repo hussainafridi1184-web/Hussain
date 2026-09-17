@@ -565,6 +565,7 @@ export default function App() {
             onResumeSurah={(surahNumber, ayahNumber) =>
               handleResumeToPosition(surahNumber, ayahNumber)
             }
+            onUpdateSettings={handleUpdateSettings}
             onOpenSettings={() => setActiveTab('settings')}
             onChallengeComplete={(hasanat) => {
               setStats((prev) => ({
@@ -650,9 +651,7 @@ export default function App() {
           onComplete={(newSettings) => {
             handleUpdateSettings(newSettings);
             setShowOnboarding(false);
-            if (newSettings.dailyQuota) {
-              markOnboardingCompleted(newSettings.dailyQuota);
-            }
+            markOnboardingCompleted(newSettings.dailyQuota || 5, newSettings.userName);
           }}
           isDark={isDark}
         />

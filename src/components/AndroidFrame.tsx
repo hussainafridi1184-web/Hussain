@@ -1,18 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import {
-  Battery,
-  Bell,
   BookOpen,
-  CheckCircle2,
   Flame,
-  LayoutGrid,
   Moon,
   Settings,
-  Smartphone,
-  Sparkles,
   Sun,
   Volume2,
-  Wifi,
 } from 'lucide-react';
 import { HabitSettings, HabitStats, NavigationTab } from '../types';
 import { BottomNavigationBar } from './BottomNavigationBar';
@@ -42,101 +35,27 @@ export const AndroidFrame: React.FC<AndroidFrameProps> = ({
   onTestNotification,
   isDark,
 }) => {
-  const [deviceFrameMode, setDeviceFrameMode] = useState<boolean>(true);
-  const [currentTime, setCurrentTime] = useState<string>('10:05');
-
-  // Live phone clock update
-  useEffect(() => {
-    const updateTime = () => {
-      const now = new Date();
-      const hours = String(now.getHours()).padStart(2, '0');
-      const minutes = String(now.getMinutes()).padStart(2, '0');
-      setCurrentTime(`${hours}:${minutes}`);
-    };
-    updateTime();
-    const interval = setInterval(updateTime, 30000);
-    return () => clearInterval(interval);
-  }, []);
-
   return (
     <div
-      className={`min-h-screen transition-colors duration-300 flex flex-col items-center justify-start p-0 sm:p-4 md:p-6 ${
+      className={`min-h-screen transition-colors duration-300 flex flex-col items-center justify-start ${
         isDark ? 'bg-slate-950 text-slate-100' : 'bg-slate-100 text-slate-900'
       }`}
     >
-      {/* Frame / Responsive Switcher Header for Desktop */}
-      <div className="hidden sm:flex items-center justify-between w-full max-w-md mb-3 px-2 text-xs text-slate-400">
-        <div className="flex items-center gap-1.5 font-medium text-emerald-500">
-          <Smartphone className="w-3.5 h-3.5" />
-          <span>Android Jetpack Compose UI</span>
-        </div>
-        <button
-          type="button"
-          onClick={() => setDeviceFrameMode(!deviceFrameMode)}
-          className={`px-2.5 py-1 rounded-lg border transition-colors ${
-            isDark
-              ? 'border-slate-800 bg-slate-900 hover:bg-slate-800 text-slate-300'
-              : 'border-slate-300 bg-white hover:bg-slate-50 text-slate-700'
-          }`}
-        >
-          {deviceFrameMode ? 'Expand Full View' : 'Phone Frame Mode'}
-        </button>
-      </div>
-
-      {/* Main Android Container */}
+      {/* Native App Container: Edge-to-edge on mobile, sleek centered container on desktop */}
       <div
-        className={`w-full relative flex flex-col overflow-hidden transition-all duration-300 ${
-          deviceFrameMode
-            ? 'max-w-md sm:rounded-[42px] sm:border-[8px] shadow-2xl sm:min-h-[840px] sm:max-h-[92vh]'
-            : 'max-w-4xl rounded-2xl border min-h-[90vh]'
-        } ${
+        className={`w-full max-w-lg min-h-screen flex flex-col relative overflow-hidden transition-all duration-300 sm:my-3 sm:rounded-3xl sm:border sm:shadow-2xl sm:min-h-[850px] sm:max-h-[96vh] ${
           isDark
-            ? 'bg-slate-950 border-slate-800 shadow-emerald-950/40'
-            : 'bg-white border-slate-200 shadow-slate-300'
+            ? 'bg-slate-950 sm:border-slate-800/80 shadow-emerald-950/40'
+            : 'bg-white sm:border-slate-200 shadow-slate-300'
         }`}
       >
-        {/* Android Status Bar (Camera punch-hole, time, signal, battery) */}
-        <div
-          className={`pt-2.5 pb-1 px-6 flex items-center justify-between text-[11px] font-semibold select-none shrink-0 ${
-            isDark ? 'text-slate-300' : 'text-slate-700'
-          }`}
-        >
-          {/* Time & App Indicator */}
-          <div className="flex items-center gap-2">
-            <span>{currentTime}</span>
-            <div className="w-1 h-1 rounded-full bg-emerald-500" />
-            <span className="text-[10px] text-emerald-500 font-bold">QuranHabit</span>
-          </div>
-
-          {/* Android Camera Punch Hole (in frame mode) */}
-          {deviceFrameMode && (
-            <div className="w-4 h-4 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center">
-              <div className="w-1.5 h-1.5 rounded-full bg-slate-800" />
-            </div>
-          )}
-
-          {/* Icons: WiFi, Signal, Battery */}
-          <div className="flex items-center gap-2">
-            {todayCompleted && (
-              <span className="text-emerald-400" title="Alarms dismissed for today">
-                <CheckCircle2 className="w-3.5 h-3.5" />
-              </span>
-            )}
-            <Wifi className="w-3.5 h-3.5" />
-            <div className="flex items-center gap-1">
-              <span className="text-[10px]">98%</span>
-              <Battery className="w-3.5 h-3.5" />
-            </div>
-          </div>
-        </div>
-
         {/* Top App Bar (Hidden in dedicated Quran Reading View, Azkar View, and Home Habit Dashboard) */}
         {activeTab !== 'quran' && activeTab !== 'habit' && activeTab !== 'azkar' && (
           <header
-            className={`px-4 py-2.5 border-b flex items-center justify-between shrink-0 transition-colors ${
+            className={`px-4 py-3 border-b flex items-center justify-between shrink-0 transition-colors ${
               isDark
-                ? 'border-slate-800/80 bg-slate-950/80 backdrop-blur-sm'
-                : 'border-slate-100 bg-white/80 backdrop-blur-sm'
+                ? 'border-slate-800/80 bg-slate-950/90 backdrop-blur-md'
+                : 'border-slate-100 bg-white/90 backdrop-blur-md'
             }`}
           >
             <div className="flex items-center gap-2.5">
@@ -158,7 +77,7 @@ export const AndroidFrame: React.FC<AndroidFrameProps> = ({
             <div className="flex items-center gap-1">
               {/* Streak Pill */}
               <div
-                className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold ${
+                className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold ${
                   isDark
                     ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
                     : 'bg-amber-50 text-amber-700 border border-amber-200'
@@ -216,7 +135,7 @@ export const AndroidFrame: React.FC<AndroidFrameProps> = ({
           </header>
         )}
 
-        {/* Scrollable Content Viewport (Locked non-scrolling flex container for QuranReader & AzkarModule, scrollable for others) */}
+        {/* Scrollable Content Viewport */}
         <main
           className={`flex-1 relative min-h-0 ${
             activeTab === 'reading' || activeTab === 'quran' || activeTab === 'explore' || activeTab === 'azkar'

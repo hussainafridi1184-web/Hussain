@@ -16,7 +16,7 @@ export const DEFAULT_REMINDER_SLOTS: ReminderSlot[] = [
 ];
 
 export const DEFAULT_SETTINGS: HabitSettings = {
-  userName: 'Hussain Afridi',
+  userName: '',
   dailyQuota: 5,
   reminderFrequency: '3x',
   reminderSlots: DEFAULT_REMINDER_SLOTS.slice(0, 3), // default 3x (Fajr, Dhuhr, Asr)
@@ -97,11 +97,17 @@ export function hasCompletedOnboarding(): boolean {
   return false;
 }
 
-export function markOnboardingCompleted(quota?: number): void {
+export function markOnboardingCompleted(quota?: number, name?: string): void {
   try {
     localStorage.setItem('quranhabit_onboarding_completed', 'true');
     if (quota) {
       localStorage.setItem('quranhabit_daily_goal', String(quota));
+    }
+    if (name !== undefined) {
+      const trimmed = name.trim();
+      if (trimmed && trimmed !== 'Hussain Afridi') {
+        localStorage.setItem('quranhabit_user_name', trimmed);
+      }
     }
     const raw = localStorage.getItem(SETTINGS_KEY);
     const current = raw ? JSON.parse(raw) : DEFAULT_SETTINGS;
@@ -109,6 +115,7 @@ export function markOnboardingCompleted(quota?: number): void {
       ...current,
       onboardingCompleted: true,
       ...(quota ? { dailyQuota: quota } : {}),
+      ...(name !== undefined && name.trim() && name.trim() !== 'Hussain Afridi' ? { userName: name.trim() } : {}),
     };
     localStorage.setItem(SETTINGS_KEY, JSON.stringify(updated));
   } catch (e) {
@@ -120,19 +127,28 @@ export function loadHabitSettings(): HabitSettings {
   try {
     const raw = localStorage.getItem(SETTINGS_KEY);
     const completed = hasCompletedOnboarding();
-    const directName = localStorage.getItem('quranhabit_user_name') || localStorage.getItem('quranhabit_profile_name');
+    let directName = localStorage.getItem('quranhabit_user_name') || localStorage.getItem('quranhabit_profile_name');
+    if (directName === 'Hussain Afridi') {
+      directName = null;
+      try {
+        localStorage.removeItem('quranhabit_user_name');
+        localStorage.removeItem('quranhabit_profile_name');
+      } catch (_) {}
+    }
     if (!raw) {
       return {
         ...DEFAULT_SETTINGS,
-        userName: directName || DEFAULT_SETTINGS.userName,
+        userName: directName || '',
         onboardingCompleted: completed,
       };
     }
     const parsed = JSON.parse(raw);
+    const rawSavedName = parsed.userName;
+    const safeSavedName = rawSavedName === 'Hussain Afridi' ? '' : (rawSavedName || '');
     return {
       ...DEFAULT_SETTINGS,
       ...parsed,
-      userName: directName || parsed.userName || DEFAULT_SETTINGS.userName,
+      userName: directName || safeSavedName || '',
       onboardingCompleted: completed || Boolean(parsed.onboardingCompleted),
     };
   } catch (e) {

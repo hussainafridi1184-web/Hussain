@@ -70,8 +70,8 @@ const MOCK_LEADERBOARD_MEMBERS: LeaderboardMember[] = [
   },
   {
     rank: 4,
-    name: 'Hussain Afridi (You)',
-    avatar: 'HA',
+    name: 'You',
+    avatar: 'YOU',
     avatarBg: 'bg-[#5AD8B5] text-[#0B3327]',
     streak: 14,
     ayahsRead: 110,
@@ -130,10 +130,10 @@ export const ProgressTracker: React.FC<ProgressTrackerProps> = ({
   const yearsToComplete = (daysToComplete / 365).toFixed(1);
 
   // Dynamic user name and initials
-  const currentUserName = settings?.userName?.trim() || 'Hussain Afridi';
+  const currentUserName = settings?.userName?.trim() || '';
   const getInitials = (name: string): string => {
     const parts = name.trim().split(/\s+/).filter(Boolean);
-    if (parts.length === 0) return 'HA';
+    if (parts.length === 0) return 'YOU';
     if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
     return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
   };
@@ -144,7 +144,7 @@ export const ProgressTracker: React.FC<ProgressTrackerProps> = ({
     m.isUser
       ? {
           ...m,
-          name: `${currentUserName} (You)`,
+          name: currentUserName ? `${currentUserName} (You)` : 'You',
           avatar: userInitials,
           streak: stats.currentStreak || m.streak,
           ayahsRead: stats.totalAyahsRead || m.ayahsRead,
