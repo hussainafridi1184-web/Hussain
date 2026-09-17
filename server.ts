@@ -77,6 +77,33 @@ async function startServer() {
     }
   });
 
+  // 3. Digital Asset Links for Android TWA / APK verification (removes URL bar in installed Android apps)
+  app.get('/.well-known/assetlinks.json', (_req, res) => {
+    const assetlinksPath =
+      findPublicOrDistFile('.well-known/assetlinks.json') ||
+      path.join(process.cwd(), 'public', '.well-known', 'assetlinks.json');
+    if (fs.existsSync(assetlinksPath)) {
+      res.setHeader('Content-Type', 'application/json; charset=utf-8');
+      res.setHeader('Cache-Control', 'public, max-age=86400');
+      res.sendFile(assetlinksPath);
+    } else {
+      res.status(404).type('text/plain').send('assetlinks.json not found');
+    }
+  });
+
+  // Explicit static handler for .well-known directory with dotfiles: 'allow'
+  app.use(
+    '/.well-known',
+    express.static(path.join(process.cwd(), 'public', '.well-known'), {
+      dotfiles: 'allow',
+      setHeaders: (res, filePath) => {
+        if (filePath.endsWith('.json')) {
+          res.setHeader('Content-Type', 'application/json; charset=utf-8');
+        }
+      },
+    })
+  );
+
   // 3. Catch-all image router: ensure requests for image files directly return image content and NEVER fall back to index.html
   app.get(/\.(png|jpe?g|svg|ico|webp|gif)$/i, (req, res) => {
     const filePath = findPublicOrDistFile(req.path);
